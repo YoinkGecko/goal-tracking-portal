@@ -49,7 +49,13 @@ function GoalSheetDetailsPage() {
     e.preventDefault();
 
     try {
-      await createGoal(formData);
+      await createGoal({
+        ...formData,
+
+        targetValue: Number(formData.targetValue),
+
+        weightage: Number(formData.weightage),
+      });
 
       fetchGoalSheet();
 
