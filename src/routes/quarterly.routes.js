@@ -15,4 +15,11 @@ router.post(
   quarterlyController.createQuarterlyUpdate
 );
 
+router.post(
+  "/:id/comment",
+  authMiddleware,
+  roleMiddleware("MANAGER"),
+  quarterlyController.addManagerComment
+);
+
 module.exports = router;

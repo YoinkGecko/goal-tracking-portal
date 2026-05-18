@@ -69,6 +69,47 @@ const createQuarterlyUpdate = async (employeeId, goalId, data) => {
   return quarterlyUpdate;
 };
 
+const addManagerComment = async (managerId, quarterlyUpdateId, comment) => {
+  const quarterlyUpdate = await prisma.quarterlyUpdate.findFirst({
+    where: {
+      id: Number(quarterlyUpdateId),
+    },
+    include: {
+      goal: {
+        include: {
+          goalSheet: {
+            include: {
+              employee: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!quarterlyUpdate) {
+    throw new Error("Quarterly update not found");
+  }
+
+  const employee = quarterlyUpdate.goal.goalSheet.employee;
+
+  if (employee.managerId !== managerId) {
+    throw new Error("Unauthorized");
+  }
+
+  const updatedQuarterlyUpdate = await prisma.quarterlyUpdate.update({
+    where: {
+      id: quarterlyUpdate.id,
+    },
+    data: {
+      managerComment: comment,
+    },
+  });
+
+  return updatedQuarterlyUpdate;
+};
+
 module.exports = {
   createQuarterlyUpdate,
+  addManagerComment,
 };
