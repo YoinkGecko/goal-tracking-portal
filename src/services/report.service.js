@@ -1,4 +1,5 @@
 const prisma = require("../config/prisma");
+const { Parser } = require("json2csv");
 
 const getAchievementReport = async () => {
 
@@ -77,7 +78,117 @@ const getCompletionDashboard = async () => {
   };
 };
 
+const exportDetailedReportCSV = async () => {
+
+  const goalSheets = await prisma.goalSheet.findMany({
+    include: {
+
+      employee: {
+        include: {
+          manager: true,
+        },
+      },
+
+      goals: {
+        include: {
+          quarterlyUpdates: true,
+        },
+      },
+    },
+  });
+
+  const reportRows = [];
+
+  for (const sheet of goalSheets) {
+
+    for (const goal of sheet.goals) {
+
+      if (goal.quarterlyUpdates.length === 0) {
+
+        reportRows.push({
+          employeeName: sheet.employee.name,
+          employeeEmail: sheet.employee.email,
+
+          managerName:
+            sheet.employee.manager?.name || "N/A",
+
+          goalSheetStatus: sheet.status,
+
+          goalTitle: goal.title,
+          thrustArea: goal.thrustArea,
+
+          uomType: goal.uomType,
+
+          targetValue: goal.targetValue,
+
+          weightage: goal.weightage,
+
+          submittedAt: sheet.submittedAt,
+
+          approvedAt: sheet.approvedAt,
+
+          quarter: "N/A",
+
+          actualValue: "N/A",
+
+          progressScore: "N/A",
+
+          progressStatus: "N/A",
+
+          managerComment: "N/A",
+        });
+
+      } else {
+
+        for (const update of goal.quarterlyUpdates) {
+
+          reportRows.push({
+            employeeName: sheet.employee.name,
+
+            employeeEmail: sheet.employee.email,
+
+            managerName:
+              sheet.employee.manager?.name || "N/A",
+
+            goalSheetStatus: sheet.status,
+
+            goalTitle: goal.title,
+
+            thrustArea: goal.thrustArea,
+
+            uomType: goal.uomType,
+
+            targetValue: goal.targetValue,
+
+            weightage: goal.weightage,
+
+            submittedAt: sheet.submittedAt,
+
+            approvedAt: sheet.approvedAt,
+
+            quarter: update.quarter,
+
+            actualValue: update.actualValue,
+
+            progressScore: update.progressScore,
+
+            progressStatus: update.status,
+
+            managerComment:
+              update.managerComment || "N/A",
+          });
+        }
+      }
+    }
+  }
+
+  const parser = new Parser();
+
+  return parser.parse(reportRows);
+};
+
 module.exports = {
   getAchievementReport,
   getCompletionDashboard,
+  exportDetailedReportCSV,
 };

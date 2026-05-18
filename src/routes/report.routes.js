@@ -23,4 +23,11 @@ router.get(
   reportController.getCompletionDashboard
 );
 
+router.get(
+  "/export/csv",
+  authMiddleware,
+  roleMiddleware("ADMIN"),
+  reportController.exportDetailedReportCSV
+);
+
 module.exports = router;
