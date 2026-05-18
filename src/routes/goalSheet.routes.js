@@ -43,4 +43,11 @@ router.post(
   goalSheetController.unlockGoalSheet
 );
 
+router.get(
+  "/",
+  authMiddleware,
+  roleMiddleware("EMPLOYEE"),
+  goalSheetController.getEmployeeGoalSheets
+);
+
 module.exports = router;
