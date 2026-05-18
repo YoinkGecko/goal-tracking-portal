@@ -86,3 +86,26 @@ export const submitGoalSheet = async (
 
   return response.data;
 };
+
+
+export const updateGoal = async (
+  goalId,
+  goalData
+) => {
+
+  const token = localStorage.getItem(
+    "token"
+  );
+
+  const response = await api.put(
+    `/goals/${goalId}`,
+    goalData,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};

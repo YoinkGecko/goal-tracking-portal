@@ -11,6 +11,7 @@ import {
 } from "../services/goalService";
 
 function GoalSheetDetailsPage() {
+  const [editingGoalId, setEditingGoalId] = useState(null);
   const { id } = useParams();
 
   const [goalSheet, setGoalSheet] = useState(null);
@@ -182,19 +183,110 @@ function GoalSheetDetailsPage() {
               <th className="text-left py-3">Weightage</th>
 
               <th className="text-left py-3">UOM</th>
+
+              <th className="text-left py-3">Actions</th>
             </tr>
           </thead>
 
           <tbody>
             {goalSheet.goals.map((goal) => (
               <tr key={goal.id} className="border-b">
-                <td className="py-4">{goal.title}</td>
+                <td className="py-4">
+                  {editingGoalId === goal.id ? (
+                    <input
+                      type="text"
+                      defaultValue={goal.title}
+                      onChange={(e) => (goal.title = e.target.value)}
+                      className="border px-2 py-1 rounded"
+                    />
+                  ) : (
+                    goal.title
+                  )}
+                </td>
 
-                <td className="py-4">{goal.targetValue}</td>
+                <td className="py-4">
+                  {editingGoalId === goal.id ? (
+                    <input
+                      type="number"
+                      defaultValue={goal.targetValue}
+                      onChange={(e) =>
+                        (goal.targetValue = Number(e.target.value))
+                      }
+                      className="border px-2 py-1 rounded"
+                    />
+                  ) : (
+                    goal.targetValue
+                  )}
+                </td>
 
-                <td className="py-4">{goal.weightage}%</td>
+                <td className="py-4">
+                  {editingGoalId === goal.id ? (
+                    <input
+                      type="number"
+                      defaultValue={goal.weightage}
+                      onChange={(e) =>
+                        (goal.weightage = Number(e.target.value))
+                      }
+                      className="border px-2 py-1 rounded"
+                    />
+                  ) : (
+                    `${goal.weightage}%`
+                  )}
+                </td>
 
-                <td className="py-4">{goal.uomType}</td>
+                <td className="py-4">
+                  {editingGoalId === goal.id ? (
+                    <select
+                      defaultValue={goal.uomType}
+                      onChange={(e) => (goal.uomType = e.target.value)}
+                      className="border px-2 py-1 rounded"
+                    >
+                      <option value="MIN">MIN</option>
+
+                      <option value="MAX">MAX</option>
+
+                      <option value="ZERO">ZERO</option>
+                    </select>
+                  ) : (
+                    goal.uomType
+                  )}
+                </td>
+
+                <td className="py-4 flex gap-2">
+                  {editingGoalId === goal.id ? (
+                    <button
+                      onClick={async () => {
+                        try {
+                          await updateGoal(goal.id, {
+                            title: goal.title,
+
+                            targetValue: goal.targetValue,
+
+                            weightage: goal.weightage,
+
+                            uomType: goal.uomType,
+                          });
+
+                          setEditingGoalId(null);
+
+                          fetchGoalSheet();
+                        } catch (error) {
+                          alert(error.response?.data?.message);
+                        }
+                      }}
+                      className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded"
+                    >
+                      Save
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setEditingGoalId(goal.id)}
+                      className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
+                    >
+                      Edit
+                    </button>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
