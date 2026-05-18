@@ -65,14 +65,27 @@ if (!isQuarterWindowOpen) {
   );
 }
 
-  const quarterlyUpdate = await prisma.quarterlyUpdate.create({
+const quarterlyUpdate =
+  await prisma.quarterlyUpdate.create({
     data: {
       goalId: goal.id,
+
       quarter: data.quarter,
-      plannedValue: goal.targetValue,
-      actualValue: data.actualValue,
-      status: data.status,
+
+      plannedValue:
+        goal.targetValue,
+
+      actualValue:
+        data.actualValue,
+
       progressScore,
+
+      status:
+        progressScore >= 100
+          ? "COMPLETED"
+          : progressScore > 0
+          ? "ON_TRACK"
+          : "NOT_STARTED",
     },
   });
 
