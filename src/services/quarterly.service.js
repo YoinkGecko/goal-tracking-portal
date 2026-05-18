@@ -1,4 +1,5 @@
 const prisma = require("../config/prisma");
+const checkQuarterWindow = require("../utils/checkQuarterWindow");
 
 const calculateProgressScore = (uomType, targetValue, actualValue) => {
   switch (uomType) {
@@ -54,6 +55,15 @@ const createQuarterlyUpdate = async (employeeId, goalId, data) => {
     goal.targetValue,
     data.actualValue,
   );
+
+const isQuarterWindowOpen =
+  checkQuarterWindow(data.quarter);
+
+if (!isQuarterWindowOpen) {
+  throw new Error(
+    `Quarter ${data.quarter} update window is closed`
+  );
+}
 
   const quarterlyUpdate = await prisma.quarterlyUpdate.create({
     data: {
