@@ -228,8 +228,12 @@ const getGoalSheetById = async (employeeId, goalSheetId) => {
       employeeId,
     },
     include: {
-      goals: true,
+  goals: {
+    include: {
+      quarterlyUpdates: true,
     },
+  },
+},
   });
 
   if (!goalSheet) {
