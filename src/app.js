@@ -7,6 +7,7 @@ const authRoutes = require("./routes/auth.routes");
 const testRoutes = require("./routes/test.routes");
 const goalSheetRoutes = require("./routes/goalSheet.routes");
 const goalRoutes = require("./routes/goal.routes");
+const quarterlyRoutes = require("./routes/quarterly.routes");
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/test", testRoutes);
 app.use("/api/goal-sheets", goalSheetRoutes);
 app.use("/api/goals", goalRoutes);
+app.use("/api/quarterly-updates", quarterlyRoutes);
 
 app.get("/", (req, res) => {
   res.json({
