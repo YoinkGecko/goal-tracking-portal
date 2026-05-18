@@ -50,4 +50,11 @@ router.get(
   goalSheetController.getEmployeeGoalSheets
 );
 
+router.get(
+  "/:id",
+  authMiddleware,
+  roleMiddleware("EMPLOYEE"),
+  goalSheetController.getGoalSheetById
+);
+
 module.exports = router;

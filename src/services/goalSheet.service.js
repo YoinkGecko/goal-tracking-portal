@@ -231,11 +231,35 @@ const getEmployeeGoalSheets = async (
   });
 };
 
+const getGoalSheetById = async (
+  employeeId,
+  goalSheetId
+) => {
+
+  const goalSheet =
+    await prisma.goalSheet.findFirst({
+      where: {
+        id: Number(goalSheetId),
+        employeeId,
+      },
+      include: {
+        goals: true,
+      },
+    });
+
+  if (!goalSheet) {
+    throw new Error("GoalSheet not found");
+  }
+
+  return goalSheet;
+};
+
 module.exports = {
   createGoalSheet,
   submitGoalSheet,
   approveGoalSheet,
   returnGoalSheet,
   unlockGoalSheet,
-  getEmployeeGoalSheets
+  getEmployeeGoalSheets,
+  getGoalSheetById
 };
