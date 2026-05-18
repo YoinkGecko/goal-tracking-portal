@@ -80,6 +80,8 @@ model Goal {
 
   weightage     Float
 
+  quarterlyUpdates QuarterlyUpdate[]
+
   createdAt     DateTime @default(now())
 }
 
@@ -101,3 +103,34 @@ model AuditLog {
   createdAt   DateTime @default(now())
 }
 
+enum Quarter {
+  Q1
+  Q2
+  Q3
+  Q4
+}
+enum GoalProgressStatus {
+  NOT_STARTED
+  ON_TRACK
+  COMPLETED
+}
+
+model QuarterlyUpdate {
+  id               Int                  @id @default(autoincrement())
+
+  goalId           Int
+  goal             Goal                 @relation(fields: [goalId], references: [id])
+
+  quarter          Quarter
+
+  plannedValue     Float?
+  actualValue      Float?
+
+  status           GoalProgressStatus
+
+  progressScore    Float?
+
+  managerComment   String?
+
+  createdAt        DateTime             @default(now())
+}
