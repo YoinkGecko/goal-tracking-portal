@@ -27,6 +27,43 @@ function AdminDashboard() {
 
   const { stats, goalSheets, auditLogs } = dashboardData;
 
+  const handleExportCSV = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await fetch(
+        "http://localhost:8000/api/reports/export/audit",
+        {
+          method: "GET",
+
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const blob = await response.blob();
+
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+
+      a.href = url;
+
+      a.download = "goal-report.csv";
+
+      document.body.appendChild(a);
+
+      a.click();
+
+      a.remove();
+    } catch (error) {
+      console.log(error);
+
+      alert("CSV export failed");
+    }
+  };
+
   return (
     <DashboardLayout>
       <h1 className="text-3xl font-bold mb-8">Admin Dashboard</h1>
@@ -65,7 +102,10 @@ function AdminDashboard() {
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-semibold">Organization GoalSheets</h2>
 
-          <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+          <button
+            onClick={handleExportCSV}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+          >
             Export CSV
           </button>
         </div>
