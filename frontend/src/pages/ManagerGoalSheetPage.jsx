@@ -8,12 +8,35 @@ import api from "../services/api";
 
 function ManagerGoalSheetPage() {
   const { id } = useParams();
+  const [commentData, setCommentData] = useState({});
 
   const [goalSheet, setGoalSheet] = useState(null);
 
   useEffect(() => {
     fetchGoalSheet();
   }, []);
+
+  const handleAddComment = async (updateId) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      await api.post(
+        `/quarterly-updates/${updateId}/comment`,
+        {
+          comment: commentData[updateId],
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      fetchGoalSheet();
+    } catch (error) {
+      alert(error.response?.data?.message || "Comment failed");
+    }
+  };
 
   const fetchGoalSheet = async () => {
     try {
@@ -103,15 +126,85 @@ function ManagerGoalSheetPage() {
 
           <tbody>
             {goalSheet.goals.map((goal) => (
-              <tr key={goal.id} className="border-b">
-                <td className="py-4">{goal.title}</td>
+              <>
+                <tr key={goal.id} className="border-b">
+                  <td className="py-4">{goal.title}</td>
 
-                <td className="py-4">{goal.targetValue}</td>
+                  <td className="py-4">{goal.targetValue}</td>
 
-                <td className="py-4">{goal.weightage}%</td>
+                  <td className="py-4">{goal.weightage}%</td>
 
-                <td className="py-4">{goal.uomType}</td>
-              </tr>
+                  <td className="py-4">{goal.uomType}</td>
+                </tr>
+
+                <tr>
+                  <td colSpan="4" className="bg-gray-50 p-4">
+                    <div className="space-y-4">
+                      {goal.quarterlyUpdates?.length > 0 ? (
+                        goal.quarterlyUpdates.map((update) => (
+                          <div
+                            key={update.id}
+                            className="border rounded-lg p-4 bg-white"
+                          >
+                            <div className="flex gap-6 mb-4">
+                              <p>
+                                <strong>Quarter:</strong> {update.quarter}
+                              </p>
+
+                              <p>
+                                <strong>Actual:</strong> {update.actualValue}
+                              </p>
+
+                              <p>
+                                <strong>Progress:</strong>{" "}
+                                {update.progressScore}%
+                              </p>
+
+                              <p>
+                                <strong>Status:</strong> {update.status}
+                              </p>
+                            </div>
+
+                            {update.managerComment && (
+                              <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
+                                <p className="text-sm text-blue-900">
+                                  <strong>Existing Comment:</strong>{" "}
+                                  {update.managerComment}
+                                </p>
+                              </div>
+                            )}
+
+                            <textarea
+                              placeholder="Add manager comment..."
+                              value={commentData[update.id] || ""}
+                              onChange={(e) =>
+                                setCommentData({
+                                  ...commentData,
+
+                                  [update.id]: e.target.value,
+                                })
+                              }
+                              className="w-full border rounded-lg p-3 mb-3"
+                              rows="3"
+                            />
+
+                            <button
+                              onClick={() => handleAddComment(update.id)}
+                              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+                            >
+                              Save Comment
+                            </button>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-gray-400">
+                          No quarterly updates yet
+                        </p>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              </>
             ))}
           </tbody>
         </table>
