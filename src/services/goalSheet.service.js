@@ -68,7 +68,80 @@ const submitGoalSheet = async (employeeId, goalSheetId) => {
   return updatedGoalSheet;
 };
 
+const approveGoalSheet = async (managerId, goalSheetId) => {
+
+  const goalSheet = await prisma.goalSheet.findFirst({
+    where: {
+      id: Number(goalSheetId),
+    },
+    include: {
+      employee: true,
+    },
+  });
+
+  if (!goalSheet) {
+    throw new Error("GoalSheet not found");
+  }
+
+  if (goalSheet.status !== "SUBMITTED") {
+    throw new Error("Only submitted GoalSheets can be approved");
+  }
+
+  if (goalSheet.employee.managerId !== managerId) {
+    throw new Error("You are not authorized to approve this GoalSheet");
+  }
+
+  const updatedGoalSheet = await prisma.goalSheet.update({
+    where: {
+      id: goalSheet.id,
+    },
+    data: {
+      status: "APPROVED",
+      approvedAt: new Date(),
+    },
+  });
+
+  return updatedGoalSheet;
+};
+
+const returnGoalSheet = async (managerId, goalSheetId) => {
+
+  const goalSheet = await prisma.goalSheet.findFirst({
+    where: {
+      id: Number(goalSheetId),
+    },
+    include: {
+      employee: true,
+    },
+  });
+
+  if (!goalSheet) {
+    throw new Error("GoalSheet not found");
+  }
+
+  if (goalSheet.status !== "SUBMITTED") {
+    throw new Error("Only submitted GoalSheets can be returned");
+  }
+
+  if (goalSheet.employee.managerId !== managerId) {
+    throw new Error("Unauthorized");
+  }
+
+  const updatedGoalSheet = await prisma.goalSheet.update({
+    where: {
+      id: goalSheet.id,
+    },
+    data: {
+      status: "RETURNED",
+    },
+  });
+
+  return updatedGoalSheet;
+};
+
 module.exports = {
   createGoalSheet,
   submitGoalSheet,
+  approveGoalSheet,
+  returnGoalSheet,
 };
