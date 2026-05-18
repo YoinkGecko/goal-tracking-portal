@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import DashboardLayout from "../layouts/DashboardLayout";
 
@@ -7,6 +8,7 @@ import { createGoalSheet } from "../services/goalService";
 
 function EmployeeDashboard() {
   const [goalSheets, setGoalSheets] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchGoalSheets();
@@ -71,7 +73,11 @@ function EmployeeDashboard() {
 
           <tbody>
             {goalSheets.map((sheet) => (
-              <tr key={sheet.id} className="border-b">
+              <tr
+                key={sheet.id}
+                className="border-b cursor-pointer hover:bg-gray-50"
+                onClick={() => navigate(`/employee/goals/${sheet.id}`)}
+              >
                 <td className="py-4">#{sheet.id}</td>
 
                 <td className="py-4">
