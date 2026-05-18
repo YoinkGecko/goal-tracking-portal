@@ -4,6 +4,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
 enum Role {
@@ -13,16 +14,16 @@ enum Role {
 }
 
 model User {
-  id          Int      @id @default(autoincrement())
-  name        String
-  email       String   @unique
-  password    String
-  role        Role
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role
 
-  managerId   Int?
-  manager     User?    @relation("ManagerEmployees", fields: [managerId], references: [id])
+  managerId Int?
+  manager   User?    @relation("ManagerEmployees", fields: [managerId], references: [id])
 
-  employees   User[]   @relation("ManagerEmployees")
+  employees User[]   @relation("ManagerEmployees")
 
-  createdAt   DateTime @default(now())
+  createdAt DateTime @default(now())
 }
