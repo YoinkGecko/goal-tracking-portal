@@ -39,10 +39,13 @@ const submitGoalSheet = async (employeeId, goalSheetId) => {
     throw new Error("GoalSheet not found");
   }
 
-  if (goalSheet.status !== "DRAFT") {
-    throw new Error("Only draft GoalSheets can be submitted");
-  }
-
+if (
+  !["DRAFT", "RETURNED"].includes(goalSheet.status)
+) {
+  throw new Error(
+    "Only draft or returned GoalSheets can be submitted"
+  );
+}
   if (goalSheet.goals.length === 0) {
     throw new Error("At least one goal is required");
   }
