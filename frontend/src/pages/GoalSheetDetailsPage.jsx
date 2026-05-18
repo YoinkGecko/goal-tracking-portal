@@ -327,9 +327,27 @@ function GoalSheetDetailsPage() {
                           ];
 
                         return (
-                          <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
-                            {latest.progressStatus}
-                          </span>
+                          <div className="space-y-2">
+                            <span
+                              className={`px-3 py-1 rounded-full text-sm text-white
+              ${
+                latest.status === "COMPLETED"
+                  ? "bg-green-600"
+                  : latest.status === "ON_TRACK"
+                    ? "bg-yellow-500"
+                    : "bg-gray-500"
+              }`}
+                            >
+                              {latest.status}
+                            </span>
+
+                            {latest.managerComment && (
+                              <div className="bg-gray-100 p-2 rounded text-sm text-gray-700">
+                                <strong>Manager:</strong>{" "}
+                                {latest.managerComment}
+                              </div>
+                            )}
+                          </div>
                         );
                       })()
                     ) : (
