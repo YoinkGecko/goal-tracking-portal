@@ -25,5 +25,59 @@ model User {
 
   employees User[]   @relation("ManagerEmployees")
 
+  goalSheets GoalSheet[]
+
   createdAt DateTime @default(now())
 }
+
+enum GoalSheetStatus {
+  DRAFT
+  SUBMITTED
+  RETURNED
+  APPROVED
+  LOCKED
+}
+
+enum UOMType {
+  MIN
+  MAX
+  TIMELINE
+  ZERO
+}
+
+model GoalSheet {
+  id           Int               @id @default(autoincrement())
+
+  employeeId   Int
+  employee     User              @relation(fields: [employeeId], references: [id])
+
+  status       GoalSheetStatus   @default(DRAFT)
+
+  submittedAt  DateTime?
+  approvedAt   DateTime?
+
+  goals        Goal[]
+
+  createdAt    DateTime          @default(now())
+}
+
+model Goal {
+  id            Int         @id @default(autoincrement())
+
+  goalSheetId   Int
+  goalSheet     GoalSheet   @relation(fields: [goalSheetId], references: [id])
+
+  thrustArea    String
+
+  title         String
+  description   String
+
+  uomType       UOMType
+
+  targetValue   Float
+
+  weightage     Float
+
+  createdAt     DateTime @default(now())
+}
+
