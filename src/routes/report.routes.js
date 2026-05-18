@@ -30,4 +30,11 @@ router.get(
   reportController.exportDetailedReportCSV
 );
 
+router.get(
+  "/export/audit",
+  authMiddleware,
+  roleMiddleware("ADMIN"),
+  reportController.exportAuditLogsCSV
+);
+
 module.exports = router;

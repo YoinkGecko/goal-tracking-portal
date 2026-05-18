@@ -187,8 +187,45 @@ const exportDetailedReportCSV = async () => {
   return parser.parse(reportRows);
 };
 
+const exportAuditLogsCSV = async () => {
+
+  const auditLogs = await prisma.auditLog.findMany({
+    include: {
+      user: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  const rows = auditLogs.map((log) => ({
+    auditId: log.id,
+
+    userName: log.user.name,
+
+    userEmail: log.user.email,
+
+    action: log.action,
+
+    entityType: log.entityType,
+
+    entityId: log.entityId,
+
+    oldValue: JSON.stringify(log.oldValue),
+
+    newValue: JSON.stringify(log.newValue),
+
+    createdAt: log.createdAt,
+  }));
+
+  const parser = new Parser();
+
+  return parser.parse(rows);
+};
+
 module.exports = {
   getAchievementReport,
   getCompletionDashboard,
   exportDetailedReportCSV,
+  exportAuditLogsCSV,
 };
