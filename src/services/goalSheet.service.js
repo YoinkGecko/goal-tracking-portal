@@ -2,11 +2,16 @@ const prisma = require("../config/prisma");
 const auditService = require("./audit.service");
 
 const createGoalSheet = async (employeeId) => {
-  const existingGoalSheet = await prisma.goalSheet.findFirst({
+  const existingGoalSheet =
+  await prisma.goalSheet.findFirst({
     where: {
       employeeId,
       status: {
-        not: "LOCKED",
+        in: [
+          "DRAFT",
+          "SUBMITTED",
+          "RETURNED"
+        ],
       },
     },
   });
