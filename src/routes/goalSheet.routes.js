@@ -57,4 +57,11 @@ router.get(
   goalSheetController.getGoalSheetById
 );
 
+router.get(
+  "/manager",
+  authMiddleware,
+  roleMiddleware("MANAGER"),
+  goalSheetController.getManagerGoalSheets
+);
+
 module.exports = router;

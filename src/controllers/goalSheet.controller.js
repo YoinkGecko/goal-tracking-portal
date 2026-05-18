@@ -149,6 +149,32 @@ const getGoalSheetById = async (
   }
 };
 
+const getManagerGoalSheets = async (
+  req,
+  res
+) => {
+
+  try {
+
+    const result =
+      await goalSheetService.getManagerGoalSheets(
+        req.user.id
+      );
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   createGoalSheet,
   submitGoalSheet,
@@ -156,5 +182,6 @@ module.exports = {
   returnGoalSheet,
   unlockGoalSheet,
   getEmployeeGoalSheets,
-  getGoalSheetById
+  getGoalSheetById,
+  getManagerGoalSheets
 };

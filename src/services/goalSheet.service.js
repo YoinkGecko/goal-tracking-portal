@@ -259,6 +259,28 @@ const getGoalSheetById = async (
   return goalSheet;
 };
 
+const getManagerGoalSheets = async (
+  managerId
+) => {
+
+  return prisma.goalSheet.findMany({
+    where: {
+      employee: {
+        managerId,
+      },
+    },
+
+    include: {
+      employee: true,
+      goals: true,
+    },
+
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+};
+
 module.exports = {
   createGoalSheet,
   submitGoalSheet,
@@ -266,5 +288,6 @@ module.exports = {
   returnGoalSheet,
   unlockGoalSheet,
   getEmployeeGoalSheets,
-  getGoalSheetById
+  getGoalSheetById,
+  getManagerGoalSheets
 };
