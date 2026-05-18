@@ -1,4 +1,5 @@
 const prisma = require("../config/prisma");
+const auditService = require("./audit.service");
 
 const createGoalSheet = async (employeeId) => {
   const existingGoalSheet = await prisma.goalSheet.findFirst({
@@ -69,7 +70,6 @@ const submitGoalSheet = async (employeeId, goalSheetId) => {
 };
 
 const approveGoalSheet = async (managerId, goalSheetId) => {
-
   const goalSheet = await prisma.goalSheet.findFirst({
     where: {
       id: Number(goalSheetId),
@@ -101,11 +101,23 @@ const approveGoalSheet = async (managerId, goalSheetId) => {
     },
   });
 
+  await auditService.createAuditLog({
+    userId: managerId,
+    entityType: "GOAL_SHEET",
+    entityId: goalSheet.id,
+    action: "APPROVE",
+    oldValue: {
+      status: "SUBMITTED",
+    },
+    newValue: {
+      status: "APPROVED",
+    },
+  });
+
   return updatedGoalSheet;
 };
 
 const returnGoalSheet = async (managerId, goalSheetId) => {
-
   const goalSheet = await prisma.goalSheet.findFirst({
     where: {
       id: Number(goalSheetId),
@@ -132,6 +144,19 @@ const returnGoalSheet = async (managerId, goalSheetId) => {
       id: goalSheet.id,
     },
     data: {
+      status: "RETURNED",
+    },
+  });
+
+  await auditService.createAuditLog({
+    userId: managerId,
+    entityType: "GOAL_SHEET",
+    entityId: goalSheet.id,
+    action: "RETURN",
+    oldValue: {
+      status: "SUBMITTED",
+    },
+    newValue: {
       status: "RETURNED",
     },
   });

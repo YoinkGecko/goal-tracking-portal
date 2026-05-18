@@ -1,4 +1,5 @@
 const prisma = require("../config/prisma");
+const auditService = require("./audit.service");
 
 const createGoal = async (employeeId, data) => {
   const goalSheet = await prisma.goalSheet.findFirst({
@@ -52,6 +53,13 @@ const updateGoal = async (employeeId, goalId, data) => {
     throw new Error("Goal not found");
   }
 
+  const oldGoalData = {
+    title: goal.title,
+    description: goal.description,
+    targetValue: goal.targetValue,
+    weightage: goal.weightage,
+  };
+
   if (goal.goalSheet.employeeId !== employeeId) {
     throw new Error("Unauthorized");
   }
@@ -69,6 +77,15 @@ const updateGoal = async (employeeId, goalId, data) => {
       id: goal.id,
     },
     data,
+  });
+
+  await auditService.createAuditLog({
+    userId: employeeId,
+    entityType: "GOAL",
+    entityId: goal.id,
+    action: "UPDATE",
+    oldValue: oldGoalData,
+    newValue: updatedGoal,
   });
 
   return updatedGoal;
