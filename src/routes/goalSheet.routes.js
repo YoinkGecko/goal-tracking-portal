@@ -22,4 +22,18 @@ router.post(
   goalSheetController.submitGoalSheet,
 );
 
+router.post(
+  "/:id/approve",
+  authMiddleware,
+  roleMiddleware("MANAGER"),
+  goalSheetController.approveGoalSheet
+);
+
+router.post(
+  "/:id/return",
+  authMiddleware,
+  roleMiddleware("MANAGER"),
+  goalSheetController.returnGoalSheet
+);
+
 module.exports = router;
