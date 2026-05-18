@@ -36,4 +36,11 @@ router.post(
   goalSheetController.returnGoalSheet
 );
 
+router.post(
+  "/:id/unlock",
+  authMiddleware,
+  roleMiddleware("ADMIN"),
+  goalSheetController.unlockGoalSheet
+);
+
 module.exports = router;

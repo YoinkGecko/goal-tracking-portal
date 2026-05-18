@@ -167,9 +167,57 @@ const returnGoalSheet = async (managerId, goalSheetId) => {
   return updatedGoalSheet;
 };
 
+const unlockGoalSheet = async (
+  adminId,
+  goalSheetId
+) => {
+
+  const goalSheet = await prisma.goalSheet.findFirst({
+    where: {
+      id: Number(goalSheetId),
+    },
+  });
+
+  if (!goalSheet) {
+    throw new Error("GoalSheet not found");
+  }
+
+  if (goalSheet.status !== "APPROVED") {
+    throw new Error(
+      "Only approved GoalSheets can be unlocked"
+    );
+  }
+
+  const updatedGoalSheet =
+    await prisma.goalSheet.update({
+      where: {
+        id: goalSheet.id,
+      },
+      data: {
+        status: "RETURNED",
+      },
+    });
+
+  await auditService.createAuditLog({
+    userId: adminId,
+    entityType: "GOAL_SHEET",
+    entityId: goalSheet.id,
+    action: "UNLOCK",
+    oldValue: {
+      status: "APPROVED",
+    },
+    newValue: {
+      status: "RETURNED",
+    },
+  });
+
+  return updatedGoalSheet;
+};
+
 module.exports = {
   createGoalSheet,
   submitGoalSheet,
   approveGoalSheet,
   returnGoalSheet,
+  unlockGoalSheet,
 };
