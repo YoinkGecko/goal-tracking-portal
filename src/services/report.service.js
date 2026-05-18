@@ -43,6 +43,41 @@ const getAchievementReport = async () => {
   return report;
 };
 
+const getCompletionDashboard = async () => {
+
+  const draftCount = await prisma.goalSheet.count({
+    where: {
+      status: "DRAFT",
+    },
+  });
+
+  const submittedCount = await prisma.goalSheet.count({
+    where: {
+      status: "SUBMITTED",
+    },
+  });
+
+  const approvedCount = await prisma.goalSheet.count({
+    where: {
+      status: "APPROVED",
+    },
+  });
+
+  const returnedCount = await prisma.goalSheet.count({
+    where: {
+      status: "RETURNED",
+    },
+  });
+
+  return {
+    DRAFT: draftCount,
+    SUBMITTED: submittedCount,
+    APPROVED: approvedCount,
+    RETURNED: returnedCount,
+  };
+};
+
 module.exports = {
   getAchievementReport,
+  getCompletionDashboard,
 };

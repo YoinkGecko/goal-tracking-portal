@@ -16,4 +16,11 @@ router.get(
   reportController.getAchievementReport
 );
 
+router.get(
+  "/dashboard",
+  authMiddleware,
+  roleMiddleware("ADMIN", "MANAGER"),
+  reportController.getCompletionDashboard
+);
+
 module.exports = router;
