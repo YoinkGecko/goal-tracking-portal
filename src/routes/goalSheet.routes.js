@@ -51,17 +51,26 @@ router.get(
 );
 
 router.get(
+  "/manager",
+  authMiddleware,
+  roleMiddleware("MANAGER"),
+  goalSheetController.getManagerGoalSheets
+);
+
+router.get(
+  "/manager/:id",
+  authMiddleware,
+  roleMiddleware("MANAGER"),
+  goalSheetController.getManagerGoalSheetById
+);
+
+router.get(
   "/:id",
   authMiddleware,
   roleMiddleware("EMPLOYEE"),
   goalSheetController.getGoalSheetById
 );
 
-router.get(
-  "/manager",
-  authMiddleware,
-  roleMiddleware("MANAGER"),
-  goalSheetController.getManagerGoalSheets
-);
+
 
 module.exports = router;

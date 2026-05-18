@@ -1,23 +1,18 @@
 import api from "./api";
 
 export const getGoalSheets = async () => {
-
   const token = localStorage.getItem("token");
 
-  const response = await api.get(
-    "/goal-sheets",
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+  const response = await api.get("/goal-sheets", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
   return response.data;
 };
 
 export const createGoalSheet = async () => {
-
   const token = localStorage.getItem("token");
 
   const response = await api.post(
@@ -27,51 +22,37 @@ export const createGoalSheet = async () => {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    }
+    },
   );
 
   return response.data;
 };
 
 export const getGoalSheetById = async (id) => {
-
   const token = localStorage.getItem("token");
 
-  const response = await api.get(
-    `/goal-sheets/${id}`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+  const response = await api.get(`/goal-sheets/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
   return response.data;
 };
 
-export const createGoal = async (
-  goalData
-) => {
-
+export const createGoal = async (goalData) => {
   const token = localStorage.getItem("token");
 
-  const response = await api.post(
-    "/goals",
-    goalData,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+  const response = await api.post("/goals", goalData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
   return response.data;
 };
 
-export const submitGoalSheet = async (
-  id
-) => {
-
+export const submitGoalSheet = async (id) => {
   const token = localStorage.getItem("token");
 
   const response = await api.post(
@@ -81,31 +62,32 @@ export const submitGoalSheet = async (
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    }
+    },
   );
 
   return response.data;
 };
 
+export const updateGoal = async (goalId, goalData) => {
+  const token = localStorage.getItem("token");
 
-export const updateGoal = async (
-  goalId,
-  goalData
-) => {
+  const response = await api.put(`/goals/${goalId}`, goalData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
-  const token = localStorage.getItem(
-    "token"
-  );
+  return response.data;
+};
 
-  const response = await api.put(
-    `/goals/${goalId}`,
-    goalData,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+export const getManagerGoalSheets = async () => {
+  const token = localStorage.getItem("token");
+
+  const response = await api.get("/goal-sheets/manager", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
   return response.data;
 };

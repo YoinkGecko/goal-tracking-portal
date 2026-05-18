@@ -8,6 +8,7 @@ import ManagerDashboard from "./pages/ManagerDashboard";
 
 import AdminDashboard from "./pages/AdminDashboard";
 import GoalSheetDetailsPage from "./pages/GoalSheetDetailsPage";
+import ManagerGoalSheetPage from "./pages/ManagerGoalSheetPage";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path="/admin" element={<AdminDashboard />} />
 
         <Route path="/employee/goals/:id" element={<GoalSheetDetailsPage />} />
+        <Route path="/manager/goals/:id" element={<ManagerGoalSheetPage />} />
       </Routes>
     </BrowserRouter>
   );

@@ -281,6 +281,37 @@ const getManagerGoalSheets = async (
   });
 };
 
+const getManagerGoalSheetById =
+  async (
+    managerId,
+    goalSheetId
+  ) => {
+
+    const goalSheet =
+      await prisma.goalSheet.findFirst({
+        where: {
+          id: Number(goalSheetId),
+
+          employee: {
+            managerId,
+          },
+        },
+
+        include: {
+          employee: true,
+          goals: true,
+        },
+      });
+
+    if (!goalSheet) {
+      throw new Error(
+        "GoalSheet not found"
+      );
+    }
+
+    return goalSheet;
+};
+
 module.exports = {
   createGoalSheet,
   submitGoalSheet,
@@ -289,5 +320,6 @@ module.exports = {
   unlockGoalSheet,
   getEmployeeGoalSheets,
   getGoalSheetById,
-  getManagerGoalSheets
+  getManagerGoalSheets,
+  getManagerGoalSheetById,
 };
