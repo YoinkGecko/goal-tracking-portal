@@ -9,6 +9,7 @@ const goalSheetRoutes = require("./routes/goalSheet.routes");
 const goalRoutes = require("./routes/goal.routes");
 const quarterlyRoutes = require("./routes/quarterly.routes");
 const reportRoutes = require("./routes/report.routes");
+const adminRoutes = require("./routes/admin.routes");
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use("/api/goal-sheets", goalSheetRoutes);
 app.use("/api/goals", goalRoutes);
 app.use("/api/quarterly-updates", quarterlyRoutes);
 app.use("/api/reports", reportRoutes);
+app.use("/api/admin", adminRoutes);
 
 
 app.get("/", (req, res) => {
