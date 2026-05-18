@@ -9,10 +9,17 @@ import {
   createGoal,
   submitGoalSheet,
   updateGoal,
+  createQuarterlyUpdate,
 } from "../services/goalService";
 
 function GoalSheetDetailsPage() {
   const [editingGoalId, setEditingGoalId] = useState(null);
+  const [updatingGoalId, setUpdatingGoalId] = useState(null);
+
+  const [quarterlyForm, setQuarterlyForm] = useState({
+    quarter: "Q1",
+    actualValue: "",
+  });
   const { id } = useParams();
 
   const [goalSheet, setGoalSheet] = useState(null);
@@ -87,6 +94,27 @@ function GoalSheetDetailsPage() {
   if (!goalSheet) {
     return <p>Loading...</p>;
   }
+
+  const handleQuarterlyUpdate = async (goalId) => {
+    try {
+      await createQuarterlyUpdate(goalId, {
+        quarter: quarterlyForm.quarter,
+
+        actualValue: Number(quarterlyForm.actualValue),
+      });
+
+      setUpdatingGoalId(null);
+
+      setQuarterlyForm({
+        quarter: "Q1",
+        actualValue: "",
+      });
+
+      fetchGoalSheet();
+    } catch (error) {
+      alert(error.response?.data?.message || "Quarterly update failed");
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -195,154 +223,218 @@ function GoalSheetDetailsPage() {
 
           <tbody>
             {goalSheet.goals.map((goal) => (
-              <tr key={goal.id} className="border-b">
-                <td className="py-4">
-                  {editingGoalId === goal.id ? (
-                    <input
-                      type="text"
-                      defaultValue={goal.title}
-                      onChange={(e) => (goal.title = e.target.value)}
-                      className="border px-2 py-1 rounded"
-                    />
-                  ) : (
-                    goal.title
-                  )}
-                </td>
+              <>
+                <tr key={goal.id} className="border-b">
+                  <td className="py-4">
+                    {editingGoalId === goal.id ? (
+                      <input
+                        type="text"
+                        defaultValue={goal.title}
+                        onChange={(e) => (goal.title = e.target.value)}
+                        className="border px-2 py-1 rounded"
+                      />
+                    ) : (
+                      goal.title
+                    )}
+                  </td>
 
-                <td className="py-4">
-                  {editingGoalId === goal.id ? (
-                    <input
-                      type="number"
-                      defaultValue={goal.targetValue}
-                      onChange={(e) =>
-                        (goal.targetValue = Number(e.target.value))
-                      }
-                      className="border px-2 py-1 rounded"
-                    />
-                  ) : (
-                    goal.targetValue
-                  )}
-                </td>
-
-                <td className="py-4">
-                  {editingGoalId === goal.id ? (
-                    <input
-                      type="number"
-                      defaultValue={goal.weightage}
-                      onChange={(e) =>
-                        (goal.weightage = Number(e.target.value))
-                      }
-                      className="border px-2 py-1 rounded"
-                    />
-                  ) : (
-                    `${goal.weightage}%`
-                  )}
-                </td>
-
-                <td className="py-4">
-                  {editingGoalId === goal.id ? (
-                    <select
-                      defaultValue={goal.uomType}
-                      onChange={(e) => (goal.uomType = e.target.value)}
-                      className="border px-2 py-1 rounded"
-                    >
-                      <option value="MIN">MIN</option>
-
-                      <option value="MAX">MAX</option>
-
-                      <option value="ZERO">ZERO</option>
-                    </select>
-                  ) : (
-                    goal.uomType
-                  )}
-                </td>
-
-                <td className="py-4">
-                  {goal.quarterlyUpdates?.length > 0 ? (
-                    (() => {
-                      const latest =
-                        goal.quarterlyUpdates[goal.quarterlyUpdates.length - 1];
-
-                      const progress = Math.min(latest.progressScore, 100);
-
-                      return (
-                        <div className="w-[200px]">
-                          <div className="w-full bg-gray-200 rounded-full h-3">
-                            <div
-                              className="bg-blue-600 h-3 rounded-full"
-                              style={{
-                                width: `${progress}%`,
-                              }}
-                            />
-                          </div>
-
-                          <p className="text-sm mt-1">{progress.toFixed(1)}%</p>
-                        </div>
-                      );
-                    })()
-                  ) : (
-                    <span className="text-gray-400">No Updates</span>
-                  )}
-                </td>
-
-                <td className="py-4">
-                  {goal.quarterlyUpdates?.length > 0 ? (
-                    (() => {
-                      const latest =
-                        goal.quarterlyUpdates[goal.quarterlyUpdates.length - 1];
-
-                      return (
-                        <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
-                          {latest.progressStatus}
-                        </span>
-                      );
-                    })()
-                  ) : (
-                    <span className="text-gray-400">N/A</span>
-                  )}
-                </td>
-
-                <td className="py-4 flex gap-2">
-                  {editingGoalId === goal.id ? (
-                    <button
-                      onClick={async () => {
-                        try {
-                          await updateGoal(goal.id, {
-                            title: goal.title,
-
-                            targetValue: goal.targetValue,
-
-                            weightage: goal.weightage,
-
-                            uomType: goal.uomType,
-                          });
-
-                          setEditingGoalId(null);
-
-                          fetchGoalSheet();
-                        } catch (error) {
-                          alert(
-                            error.response?.data?.message ||
-                              error.response?.data?.error ||
-                              error.message ||
-                              "Something went wrong",
-                          );
+                  <td className="py-4">
+                    {editingGoalId === goal.id ? (
+                      <input
+                        type="number"
+                        defaultValue={goal.targetValue}
+                        onChange={(e) =>
+                          (goal.targetValue = Number(e.target.value))
                         }
-                      }}
-                      className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded"
-                    >
-                      Save
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => setEditingGoalId(goal.id)}
-                      className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
-                    >
-                      Edit
-                    </button>
-                  )}
-                </td>
-              </tr>
+                        className="border px-2 py-1 rounded"
+                      />
+                    ) : (
+                      goal.targetValue
+                    )}
+                  </td>
+
+                  <td className="py-4">
+                    {editingGoalId === goal.id ? (
+                      <input
+                        type="number"
+                        defaultValue={goal.weightage}
+                        onChange={(e) =>
+                          (goal.weightage = Number(e.target.value))
+                        }
+                        className="border px-2 py-1 rounded"
+                      />
+                    ) : (
+                      `${goal.weightage}%`
+                    )}
+                  </td>
+
+                  <td className="py-4">
+                    {editingGoalId === goal.id ? (
+                      <select
+                        defaultValue={goal.uomType}
+                        onChange={(e) => (goal.uomType = e.target.value)}
+                        className="border px-2 py-1 rounded"
+                      >
+                        <option value="MIN">MIN</option>
+
+                        <option value="MAX">MAX</option>
+
+                        <option value="ZERO">ZERO</option>
+                      </select>
+                    ) : (
+                      goal.uomType
+                    )}
+                  </td>
+
+                  <td className="py-4">
+                    {goal.quarterlyUpdates?.length > 0 ? (
+                      (() => {
+                        const latest =
+                          goal.quarterlyUpdates[
+                            goal.quarterlyUpdates.length - 1
+                          ];
+
+                        const progress = Math.min(latest.progressScore, 100);
+
+                        return (
+                          <div className="w-[200px]">
+                            <div className="w-full bg-gray-200 rounded-full h-3">
+                              <div
+                                className="bg-blue-600 h-3 rounded-full"
+                                style={{
+                                  width: `${progress}%`,
+                                }}
+                              />
+                            </div>
+
+                            <p className="text-sm mt-1">
+                              {progress.toFixed(1)}%
+                            </p>
+                          </div>
+                        );
+                      })()
+                    ) : (
+                      <span className="text-gray-400">No Updates</span>
+                    )}
+                  </td>
+
+                  <td className="py-4">
+                    {goal.quarterlyUpdates?.length > 0 ? (
+                      (() => {
+                        const latest =
+                          goal.quarterlyUpdates[
+                            goal.quarterlyUpdates.length - 1
+                          ];
+
+                        return (
+                          <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
+                            {latest.progressStatus}
+                          </span>
+                        );
+                      })()
+                    ) : (
+                      <span className="text-gray-400">N/A</span>
+                    )}
+                  </td>
+
+                  <td className="py-4 flex gap-2">
+                    {editingGoalId === goal.id ? (
+                      <button
+                        onClick={async () => {
+                          try {
+                            await updateGoal(goal.id, {
+                              title: goal.title,
+
+                              targetValue: goal.targetValue,
+
+                              weightage: goal.weightage,
+
+                              uomType: goal.uomType,
+                            });
+
+                            setEditingGoalId(null);
+
+                            fetchGoalSheet();
+                          } catch (error) {
+                            alert(
+                              error.response?.data?.message ||
+                                error.response?.data?.error ||
+                                error.message ||
+                                "Something went wrong",
+                            );
+                          }
+                        }}
+                        className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded"
+                      >
+                        Save
+                      </button>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => setEditingGoalId(goal.id)}
+                          className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
+                        >
+                          Edit
+                        </button>
+
+                        <button
+                          onClick={() => setUpdatingGoalId(goal.id)}
+                          className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded"
+                        >
+                          Update
+                        </button>
+                      </>
+                    )}
+                  </td>
+                </tr>
+
+                {updatingGoalId === goal.id && (
+                  <tr>
+                    <td colSpan="7" className="bg-gray-50 p-4">
+                      <div className="flex gap-4 items-center">
+                        <select
+                          value={quarterlyForm.quarter}
+                          onChange={(e) =>
+                            setQuarterlyForm({
+                              ...quarterlyForm,
+                              quarter: e.target.value,
+                            })
+                          }
+                          className="border px-4 py-2 rounded"
+                        >
+                          <option value="Q1">Q1</option>
+
+                          <option value="Q2">Q2</option>
+
+                          <option value="Q3">Q3</option>
+
+                          <option value="Q4">Q4</option>
+                        </select>
+
+                        <input
+                          type="number"
+                          placeholder="Actual Value"
+                          value={quarterlyForm.actualValue}
+                          onChange={(e) =>
+                            setQuarterlyForm({
+                              ...quarterlyForm,
+                              actualValue: e.target.value,
+                            })
+                          }
+                          className="border px-4 py-2 rounded"
+                        />
+
+                        <button
+                          onClick={() => handleQuarterlyUpdate(goal.id)}
+                          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+                        >
+                          Submit Update
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </>
             ))}
           </tbody>
         </table>

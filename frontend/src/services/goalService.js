@@ -91,3 +91,23 @@ export const getManagerGoalSheets = async () => {
 
   return response.data;
 };
+
+export const createQuarterlyUpdate =
+  async (goalId, data) => {
+
+    const token =
+      localStorage.getItem("token");
+
+    const response = await api.post(
+      `/quarterly-updates/${goalId}`,
+      data,
+      {
+        headers: {
+          Authorization:
+            `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data;
+};
