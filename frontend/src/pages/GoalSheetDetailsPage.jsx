@@ -8,6 +8,7 @@ import {
   getGoalSheetById,
   createGoal,
   submitGoalSheet,
+  updateGoal,
 } from "../services/goalService";
 
 function GoalSheetDetailsPage() {
@@ -271,7 +272,12 @@ function GoalSheetDetailsPage() {
 
                           fetchGoalSheet();
                         } catch (error) {
-                          alert(error.response?.data?.message);
+                          alert(
+                            error.response?.data?.message ||
+                              error.response?.data?.error ||
+                              error.message ||
+                              "Something went wrong",
+                          );
                         }
                       }}
                       className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded"
