@@ -1,7 +1,6 @@
 const prisma = require("../config/prisma");
 
 const createGoal = async (employeeId, data) => {
-
   const goalSheet = await prisma.goalSheet.findFirst({
     where: {
       employeeId,
@@ -39,6 +38,43 @@ const createGoal = async (employeeId, data) => {
   return goal;
 };
 
+const updateGoal = async (employeeId, goalId, data) => {
+  const goal = await prisma.goal.findFirst({
+    where: {
+      id: Number(goalId),
+    },
+    include: {
+      goalSheet: true,
+    },
+  });
+
+  if (!goal) {
+    throw new Error("Goal not found");
+  }
+
+  if (goal.goalSheet.employeeId !== employeeId) {
+    throw new Error("Unauthorized");
+  }
+
+  if (!["DRAFT", "RETURNED"].includes(goal.goalSheet.status)) {
+    throw new Error("GoalSheet is locked");
+  }
+
+  if (data.weightage && data.weightage < 10) {
+    throw new Error("Minimum weightage is 10%");
+  }
+
+  const updatedGoal = await prisma.goal.update({
+    where: {
+      id: goal.id,
+    },
+    data,
+  });
+
+  return updatedGoal;
+};
+
 module.exports = {
   createGoal,
+  updateGoal,
 };

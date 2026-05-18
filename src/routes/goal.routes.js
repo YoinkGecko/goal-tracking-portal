@@ -15,4 +15,11 @@ router.post(
   goalController.createGoal
 );
 
+router.put(
+  "/:id",
+  authMiddleware,
+  roleMiddleware("EMPLOYEE"),
+  goalController.updateGoal
+);
+
 module.exports = router;
