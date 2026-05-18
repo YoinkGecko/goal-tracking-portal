@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import DashboardLayout from "../layouts/DashboardLayout";
 
 import { getGoalSheets } from "../services/goalService";
+import { createGoalSheet } from "../services/goalService";
 
 function EmployeeDashboard() {
   const [goalSheets, setGoalSheets] = useState([]);
@@ -21,6 +22,16 @@ function EmployeeDashboard() {
     }
   };
 
+  const handleCreateGoalSheet = async () => {
+    try {
+      await createGoalSheet();
+
+      fetchGoalSheets();
+    } catch (error) {
+      alert(error.response?.data?.message);
+    }
+  };
+
   return (
     <DashboardLayout>
       <h1 className="text-3xl font-bold mb-6">Employee Dashboard</h1>
@@ -35,6 +46,15 @@ function EmployeeDashboard() {
 
       <div className="bg-white rounded-xl shadow p-6">
         <h2 className="text-2xl font-semibold mb-4">GoalSheets</h2>
+
+        <div className="flex justify-end mb-6">
+          <button
+            onClick={handleCreateGoalSheet}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg"
+          >
+            Create GoalSheet
+          </button>
+        </div>
 
         <table className="w-full">
           <thead>

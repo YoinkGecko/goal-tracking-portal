@@ -15,3 +15,20 @@ export const getGoalSheets = async () => {
 
   return response.data;
 };
+
+export const createGoalSheet = async () => {
+
+  const token = localStorage.getItem("token");
+
+  const response = await api.post(
+    "/goal-sheets",
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};
