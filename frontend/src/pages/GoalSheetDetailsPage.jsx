@@ -185,6 +185,10 @@ function GoalSheetDetailsPage() {
 
               <th className="text-left py-3">UOM</th>
 
+              <th className="text-left py-3">Progress</th>
+
+              <th className="text-left py-3">Status</th>
+
               <th className="text-left py-3">Actions</th>
             </tr>
           </thead>
@@ -250,6 +254,51 @@ function GoalSheetDetailsPage() {
                     </select>
                   ) : (
                     goal.uomType
+                  )}
+                </td>
+
+                <td className="py-4">
+                  {goal.quarterlyUpdates?.length > 0 ? (
+                    (() => {
+                      const latest =
+                        goal.quarterlyUpdates[goal.quarterlyUpdates.length - 1];
+
+                      const progress = Math.min(latest.progressScore, 100);
+
+                      return (
+                        <div className="w-[200px]">
+                          <div className="w-full bg-gray-200 rounded-full h-3">
+                            <div
+                              className="bg-blue-600 h-3 rounded-full"
+                              style={{
+                                width: `${progress}%`,
+                              }}
+                            />
+                          </div>
+
+                          <p className="text-sm mt-1">{progress.toFixed(1)}%</p>
+                        </div>
+                      );
+                    })()
+                  ) : (
+                    <span className="text-gray-400">No Updates</span>
+                  )}
+                </td>
+
+                <td className="py-4">
+                  {goal.quarterlyUpdates?.length > 0 ? (
+                    (() => {
+                      const latest =
+                        goal.quarterlyUpdates[goal.quarterlyUpdates.length - 1];
+
+                      return (
+                        <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
+                          {latest.progressStatus}
+                        </span>
+                      );
+                    })()
+                  ) : (
+                    <span className="text-gray-400">N/A</span>
                   )}
                 </td>
 

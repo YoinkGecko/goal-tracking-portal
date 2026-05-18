@@ -2,16 +2,11 @@ const prisma = require("../config/prisma");
 const auditService = require("./audit.service");
 
 const createGoalSheet = async (employeeId) => {
-  const existingGoalSheet =
-  await prisma.goalSheet.findFirst({
+  const existingGoalSheet = await prisma.goalSheet.findFirst({
     where: {
       employeeId,
       status: {
-        in: [
-          "DRAFT",
-          "SUBMITTED",
-          "RETURNED"
-        ],
+        in: ["DRAFT", "SUBMITTED", "RETURNED"],
       },
     },
   });
@@ -44,13 +39,9 @@ const submitGoalSheet = async (employeeId, goalSheetId) => {
     throw new Error("GoalSheet not found");
   }
 
-if (
-  !["DRAFT", "RETURNED"].includes(goalSheet.status)
-) {
-  throw new Error(
-    "Only draft or returned GoalSheets can be submitted"
-  );
-}
+  if (!["DRAFT", "RETURNED"].includes(goalSheet.status)) {
+    throw new Error("Only draft or returned GoalSheets can be submitted");
+  }
   if (goalSheet.goals.length === 0) {
     throw new Error("At least one goal is required");
   }
@@ -172,11 +163,7 @@ const returnGoalSheet = async (managerId, goalSheetId) => {
   return updatedGoalSheet;
 };
 
-const unlockGoalSheet = async (
-  adminId,
-  goalSheetId
-) => {
-
+const unlockGoalSheet = async (adminId, goalSheetId) => {
   const goalSheet = await prisma.goalSheet.findFirst({
     where: {
       id: Number(goalSheetId),
@@ -188,20 +175,17 @@ const unlockGoalSheet = async (
   }
 
   if (goalSheet.status !== "APPROVED") {
-    throw new Error(
-      "Only approved GoalSheets can be unlocked"
-    );
+    throw new Error("Only approved GoalSheets can be unlocked");
   }
 
-  const updatedGoalSheet =
-    await prisma.goalSheet.update({
-      where: {
-        id: goalSheet.id,
-      },
-      data: {
-        status: "RETURNED",
-      },
-    });
+  const updatedGoalSheet = await prisma.goalSheet.update({
+    where: {
+      id: goalSheet.id,
+    },
+    data: {
+      status: "RETURNED",
+    },
+  });
 
   await auditService.createAuditLog({
     userId: adminId,
@@ -219,16 +203,17 @@ const unlockGoalSheet = async (
   return updatedGoalSheet;
 };
 
-const getEmployeeGoalSheets = async (
-  employeeId
-) => {
-
+const getEmployeeGoalSheets = async (employeeId) => {
   return prisma.goalSheet.findMany({
     where: {
       employeeId,
     },
     include: {
-      goals: true,
+      goals: {
+        include: {
+          quarterlyUpdates: true,
+        },
+      },
     },
     orderBy: {
       createdAt: "desc",
@@ -236,21 +221,16 @@ const getEmployeeGoalSheets = async (
   });
 };
 
-const getGoalSheetById = async (
-  employeeId,
-  goalSheetId
-) => {
-
-  const goalSheet =
-    await prisma.goalSheet.findFirst({
-      where: {
-        id: Number(goalSheetId),
-        employeeId,
-      },
-      include: {
-        goals: true,
-      },
-    });
+const getGoalSheetById = async (employeeId, goalSheetId) => {
+  const goalSheet = await prisma.goalSheet.findFirst({
+    where: {
+      id: Number(goalSheetId),
+      employeeId,
+    },
+    include: {
+      goals: true,
+    },
+  });
 
   if (!goalSheet) {
     throw new Error("GoalSheet not found");
@@ -259,10 +239,7 @@ const getGoalSheetById = async (
   return goalSheet;
 };
 
-const getManagerGoalSheets = async (
-  managerId
-) => {
-
+const getManagerGoalSheets = async (managerId) => {
   return prisma.goalSheet.findMany({
     where: {
       employee: {
@@ -272,7 +249,11 @@ const getManagerGoalSheets = async (
 
     include: {
       employee: true,
-      goals: true,
+      goals: {
+        include: {
+          quarterlyUpdates: true,
+        },
+      },
     },
 
     orderBy: {
@@ -281,35 +262,31 @@ const getManagerGoalSheets = async (
   });
 };
 
-const getManagerGoalSheetById =
-  async (
-    managerId,
-    goalSheetId
-  ) => {
+const getManagerGoalSheetById = async (managerId, goalSheetId) => {
+  const goalSheet = await prisma.goalSheet.findFirst({
+    where: {
+      id: Number(goalSheetId),
 
-    const goalSheet =
-      await prisma.goalSheet.findFirst({
-        where: {
-          id: Number(goalSheetId),
+      employee: {
+        managerId,
+      },
+    },
 
-          employee: {
-            managerId,
-          },
-        },
-
+    include: {
+      employee: true,
+      goals: {
         include: {
-          employee: true,
-          goals: true,
+          quarterlyUpdates: true,
         },
-      });
+      },
+    },
+  });
 
-    if (!goalSheet) {
-      throw new Error(
-        "GoalSheet not found"
-      );
-    }
+  if (!goalSheet) {
+    throw new Error("GoalSheet not found");
+  }
 
-    return goalSheet;
+  return goalSheet;
 };
 
 module.exports = {
