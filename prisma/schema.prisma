@@ -27,6 +27,8 @@ model User {
 
   goalSheets GoalSheet[]
 
+  auditLogs AuditLog[]
+
   createdAt DateTime @default(now())
 }
 
@@ -79,5 +81,23 @@ model Goal {
   weightage     Float
 
   createdAt     DateTime @default(now())
+}
+
+model AuditLog {
+  id          Int      @id @default(autoincrement())
+
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+
+  entityType  String
+
+  entityId    Int
+
+  action      String
+
+  oldValue    Json?
+  newValue    Json?
+
+  createdAt   DateTime @default(now())
 }
 
