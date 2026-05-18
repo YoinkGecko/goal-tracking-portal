@@ -12,7 +12,14 @@ router.post(
   "/",
   authMiddleware,
   roleMiddleware("EMPLOYEE"),
-  goalSheetController.createGoalSheet
+  goalSheetController.createGoalSheet,
+);
+
+router.post(
+  "/:id/submit",
+  authMiddleware,
+  roleMiddleware("EMPLOYEE"),
+  goalSheetController.submitGoalSheet,
 );
 
 module.exports = router;

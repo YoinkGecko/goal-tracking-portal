@@ -16,6 +16,26 @@ const createGoalSheet = async (req, res) => {
   }
 };
 
+const submitGoalSheet = async (req, res) => {
+  try {
+    const result = await goalSheetService.submitGoalSheet(
+      req.user.id,
+      req.params.id,
+    );
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   createGoalSheet,
+  submitGoalSheet,
 };
